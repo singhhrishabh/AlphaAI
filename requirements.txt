@@ -8,7 +8,6 @@ uvicorn[standard]==0.34.0
 # Market Data
 yfinance==0.2.51
 pandas==2.2.3
-pandas-ta==0.3.14b1
 numpy==1.26.4
 
 # News & Sentiment
