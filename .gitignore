@@ -1,0 +1,39 @@
+# AlphaAI - Gitignore
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.eggs/
+
+# Database
+*.db
+*.sqlite3
+
+# Reports
+reports/generated/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Models cache
+.cache/
+models/
+
+# Node (if frontend built with npm)
+node_modules/
