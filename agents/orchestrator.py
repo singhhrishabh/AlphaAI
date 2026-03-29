@@ -25,16 +25,47 @@ class Orchestrator:
 
     def __init__(self, use_llm=True):
         self.config = config
+        self.use_llm = use_llm
         self.news_provider = create_news_provider(config.data.finnhub_api_key)
 
-        # Initialize all agents
-        self.fundamental = FundamentalAgent(config, use_llm=use_llm)
-        self.technical = TechnicalAgent(config, use_llm=use_llm)
-        self.sentiment = SentimentAgent(config, use_llm=use_llm)
-        self.risk = RiskAgent(config, use_llm=use_llm)
-        self.portfolio_mgr = PortfolioManager(config, use_llm=use_llm)
+        # Agents are lazy-loaded on first use to save memory
+        self._fundamental = None
+        self._technical = None
+        self._sentiment = None
+        self._risk = None
+        self._portfolio_mgr = None
 
-        logger.info("✅ Orchestrator initialized with all agents")
+        logger.info("✅ Orchestrator initialized (agents will load on first analysis)")
+
+    @property
+    def fundamental(self):
+        if self._fundamental is None:
+            self._fundamental = FundamentalAgent(self.config, use_llm=self.use_llm)
+        return self._fundamental
+
+    @property
+    def technical(self):
+        if self._technical is None:
+            self._technical = TechnicalAgent(self.config, use_llm=self.use_llm)
+        return self._technical
+
+    @property
+    def sentiment(self):
+        if self._sentiment is None:
+            self._sentiment = SentimentAgent(self.config, use_llm=self.use_llm)
+        return self._sentiment
+
+    @property
+    def risk(self):
+        if self._risk is None:
+            self._risk = RiskAgent(self.config, use_llm=self.use_llm)
+        return self._risk
+
+    @property
+    def portfolio_mgr(self):
+        if self._portfolio_mgr is None:
+            self._portfolio_mgr = PortfolioManager(self.config, use_llm=self.use_llm)
+        return self._portfolio_mgr
 
     def analyze_stock(self, symbol: str) -> dict:
         """
@@ -74,17 +105,10 @@ class Orchestrator:
             (self.risk, stock_data),
         ]
 
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = {executor.submit(run_agent, agent, data): agent.name
-                      for agent, data in agents_to_run}
-            for future in as_completed(futures):
-                name = futures[future]
-                try:
-                    result = future.result()
-                    agent_signals.append(result)
-                    logger.info(f"  ✅ {name}: {result.signal} ({result.confidence}%)")
-                except Exception as e:
-                    logger.error(f"  ❌ {name} failed: {e}")
+        for agent, data in agents_to_run:
+            result = run_agent(agent, data)
+            agent_signals.append(result)
+            logger.info(f"  ✅ {agent.name}: {result.signal} ({result.confidence}%)")
 
         # Step 4: Portfolio Manager makes final decision
         logger.info("🧠 Step 4: Portfolio Manager synthesizing...")

@@ -48,12 +48,8 @@ async def lifespan(app: FastAPI):
     for w in warnings:
         logger.warning(w)
 
-    # Initialize orchestrator (try with LLM, fallback to rule-based)
-    try:
-        orchestrator = Orchestrator(use_llm=True)
-    except Exception as e:
-        logger.warning(f"⚠️  LLM init failed, using rule-based mode: {e}")
-        orchestrator = Orchestrator(use_llm=False)
+    # Initialize orchestrator (agents lazy-load on first analysis to save memory)
+    orchestrator = Orchestrator(use_llm=True)
 
     # Add default watchlist stocks to DB
     for ticker in config.data.tickers:
