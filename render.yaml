@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: alphaai-hedge-fund
+    runtime: python
+    buildCommand: pip install -r requirements-render.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: LLM_PROVIDER
+        value: openai
+      - key: WATCHLIST
+        value: AAPL,MSFT,GOOGL,NVDA,TSLA,AMZN,META,JPM,V,UNH

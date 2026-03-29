@@ -5,7 +5,7 @@
 
 // ─── Configuration ───────────────────────────────────────
 const CONFIG = {
-    apiUrl: localStorage.getItem('alphaai_api_url') || 'http://localhost:8000',
+    apiUrl: localStorage.getItem('alphaai_api_url') || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : window.location.origin),
     watchlist: (localStorage.getItem('alphaai_watchlist') || 'AAPL,MSFT,GOOGL,NVDA,TSLA,AMZN').split(','),
     refreshInterval: 30000,
 };
