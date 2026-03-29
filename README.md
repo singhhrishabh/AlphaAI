@@ -204,6 +204,10 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-**Built with ❤️ by AlphaAI Team**
+## 👤 Author
+
+Built by **Rishabh** — B.E. ECE, BITS Pilani Dubai Campus  
+Project developed as part of independent startup exploration, 2026.
+
 
 </div>
