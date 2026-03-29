@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AlphaAI - AI-Native Hedge Fund Platform. Multi-agent AI investment analysis system.">
+    <title>AlphaAI — AI-Native Hedge Fund</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">α</div>
+                <div class="logo-text">
+                    <span class="logo-name">AlphaAI</span>
+                    <span class="logo-sub">Hedge Fund</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="#" class="nav-link active" data-page="dashboard" id="nav-dashboard">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-link" data-page="analyze" id="nav-analyze">
+                <span class="nav-icon">🔍</span>
+                <span>Analyze Stock</span>
+            </a>
+            <a href="#" class="nav-link" data-page="signals" id="nav-signals">
+                <span class="nav-icon">📡</span>
+                <span>Signals Feed</span>
+            </a>
+            <a href="#" class="nav-link" data-page="portfolio" id="nav-portfolio">
+                <span class="nav-icon">💼</span>
+                <span>Portfolio</span>
+            </a>
+            <a href="#" class="nav-link" data-page="reports" id="nav-reports">
+                <span class="nav-icon">📄</span>
+                <span>Reports</span>
+            </a>
+            <a href="#" class="nav-link" data-page="settings" id="nav-settings">
+                <span class="nav-icon">⚙️</span>
+                <span>Settings</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="status-badge" id="api-status">
+                <span class="status-dot"></span>
+                <span>Connecting...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <h1 class="page-title" id="page-title">Dashboard</h1>
+            </div>
+            <div class="top-bar-right">
+                <div class="quick-analyze">
+                    <input type="text" class="quick-input" id="quick-ticker" placeholder="Enter ticker..." maxlength="5">
+                    <button class="btn btn-primary btn-glow" id="quick-analyze-btn">
+                        <span class="btn-text">Analyze</span>
+                        <span class="btn-loader hidden" id="quick-loader"></span>
+                    </button>
+                </div>
+                <div class="time-display" id="time-display"></div>
+            </div>
+        </header>
+
+        <!-- Page Container -->
+        <div class="page-container" id="page-container">
+            <!-- Dashboard Page -->
+            <div class="page active" id="page-dashboard">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-stocks">0</div>
+                            <div class="stat-label">Tracked Stocks</div>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4, #22d3ee);">📡</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-signals">0</div>
+                            <div class="stat-label">Total Signals</div>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #34d399);">📄</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-reports">0</div>
+                            <div class="stat-label">Reports Generated</div>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">🎯</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-accuracy">—</div>
+                            <div class="stat-label">Confidence Avg</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Recent Signals -->
+                    <div class="glass-card card-large">
+                        <div class="card-header">
+                            <h2>Recent Signals</h2>
+                            <span class="badge badge-live">LIVE</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="signals-list" id="dashboard-signals">
+                                <div class="empty-state">
+                                    <span class="empty-icon">📡</span>
+                                    <p>No signals yet. Analyze a stock to get started!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Signal Distribution -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>Signal Distribution (7d)</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="distribution-chart" id="signal-distribution">
+                                <div class="dist-bar">
+                                    <div class="dist-fill buy" id="dist-buy" style="width: 0%"></div>
+                                    <span class="dist-label">BUY <span id="dist-buy-count">0</span></span>
+                                </div>
+                                <div class="dist-bar">
+                                    <div class="dist-fill hold" id="dist-hold" style="width: 0%"></div>
+                                    <span class="dist-label">HOLD <span id="dist-hold-count">0</span></span>
+                                </div>
+                                <div class="dist-bar">
+                                    <div class="dist-fill sell" id="dist-sell" style="width: 0%"></div>
+                                    <span class="dist-label">SELL <span id="dist-sell-count">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Watchlist -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>Watchlist</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="watchlist" id="dashboard-watchlist">
+                                <div class="empty-state">
+                                    <span class="empty-icon">📋</span>
+                                    <p>Loading watchlist...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analyze Page -->
+            <div class="page" id="page-analyze">
+                <div class="analyze-header glass-card">
+                    <h2>🔍 Stock Analysis</h2>
+                    <p>Enter a ticker symbol to run a comprehensive AI-powered analysis</p>
+                    <div class="analyze-form">
+                        <input type="text" class="analyze-input" id="analyze-ticker" placeholder="e.g., AAPL" maxlength="5">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="use-llm" checked>
+                            <span>Use AI (LLM)</span>
+                        </label>
+                        <button class="btn btn-primary btn-glow btn-lg" id="analyze-btn">
+                            🚀 Run Analysis
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Analysis Results -->
+                <div id="analysis-results" class="hidden">
+                    <!-- Executive Summary -->
+                    <div class="glass-card analysis-summary" id="analysis-summary">
+                        <!-- Filled by JS -->
+                    </div>
+
+                    <!-- Agent Results Grid -->
+                    <div class="agents-grid" id="agents-grid">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div class="analysis-loading hidden" id="analysis-loading">
+                    <div class="loading-animation">
+                        <div class="agent-loading-item" id="load-fundamental">
+                            <span class="loading-dot"></span>
+                            <span>Fundamental Analyst analyzing...</span>
+                        </div>
+                        <div class="agent-loading-item" id="load-technical">
+                            <span class="loading-dot"></span>
+                            <span>Technical Analyst processing charts...</span>
+                        </div>
+                        <div class="agent-loading-item" id="load-sentiment">
+                            <span class="loading-dot"></span>
+                            <span>Sentiment Analyst reading news...</span>
+                        </div>
+                        <div class="agent-loading-item" id="load-risk">
+                            <span class="loading-dot"></span>
+                            <span>Risk Manager evaluating risk...</span>
+                        </div>
+                        <div class="agent-loading-item" id="load-portfolio">
+                            <span class="loading-dot"></span>
+                            <span>Portfolio Manager deciding...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signals Page -->
+            <div class="page" id="page-signals">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2>📡 Trading Signals Feed</h2>
+                        <button class="btn btn-secondary" id="refresh-signals">↻ Refresh</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="signals-table" id="signals-table">
+                            <div class="empty-state">
+                                <span class="empty-icon">📡</span>
+                                <p>No signals yet. Run an analysis to generate signals.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Page -->
+            <div class="page" id="page-portfolio">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2>💼 Portfolio Overview</h2>
+                    </div>
+                    <div class="card-body">
+                        <div id="portfolio-content">
+                            <div class="empty-state">
+                                <span class="empty-icon">💼</span>
+                                <p>Portfolio tracking coming soon. Run analyses to build your signal history.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div class="page" id="page-reports">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2>📄 Analysis Reports</h2>
+                        <button class="btn btn-secondary" id="refresh-reports">↻ Refresh</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="reports-list">
+                            <div class="empty-state">
+                                <span class="empty-icon">📄</span>
+                                <p>No reports yet. Analyze a stock to generate a report.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="page" id="page-settings">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2>⚙️ Settings</h2>
+                    </div>
+                    <div class="card-body settings-body">
+                        <div class="setting-group">
+                            <h3>API Configuration</h3>
+                            <div class="setting-item">
+                                <label>Backend API URL</label>
+                                <input type="text" class="setting-input" id="setting-api-url" value="http://localhost:8000">
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <h3>Watchlist</h3>
+                            <div class="setting-item">
+                                <label>Tickers (comma-separated)</label>
+                                <input type="text" class="setting-input" id="setting-watchlist" value="AAPL,MSFT,GOOGL,NVDA,TSLA,AMZN">
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <h3>About</h3>
+                            <p class="setting-description">
+                                AlphaAI v1.0 — AI-Native Hedge Fund Platform<br>
+                                Multi-agent AI system for investment analysis.<br><br>
+                                <strong>⚠️ Disclaimer:</strong> This is for educational/research purposes only.
+                                Not financial advice.
+                            </p>
+                        </div>
+                        <button class="btn btn-primary" id="save-settings">💾 Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
