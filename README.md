@@ -16,7 +16,10 @@
 > ⚠️ **Disclaimer:** This project is for **educational and research purposes only**. It does NOT constitute financial advice. Do NOT trade real money based on these signals without professional guidance.
 
 ---
+For real time Stock Analysis[https://alphaai-mdta.onrender.com/]
+For Static WEB page[https://singhhrishabh.github.io/AlphaAI/]
 
+---
 ## 📸 Dashboard Preview
 
 The platform features a stunning dark-mode glassmorphism web dashboard:
