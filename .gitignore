@@ -37,3 +37,4 @@ models/
 
 # Node (if frontend built with npm)
 node_modules/
+output/
