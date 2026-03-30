@@ -4,6 +4,7 @@ AlphaAI — FastAPI Backend Server
 Serves the analysis engine and dashboard data.
 """
 import logging
+import os
 import sys
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -48,8 +49,12 @@ async def lifespan(app: FastAPI):
     for w in warnings:
         logger.warning(w)
 
-    # Initialize orchestrator (agents lazy-load on first analysis to save memory)
-    orchestrator = Orchestrator(use_llm=True)
+    # On Render free tier (512MB), disable LLM to save memory
+    is_render = os.environ.get('RENDER', '') == 'true'
+    use_llm = not is_render
+    if is_render:
+        logger.info("☁️  Running on Render free tier — using rule-based mode (no LLM) to save memory")
+    orchestrator = Orchestrator(use_llm=use_llm)
 
     # Add default watchlist stocks to DB
     for ticker in config.data.tickers:

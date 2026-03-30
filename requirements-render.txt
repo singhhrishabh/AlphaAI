@@ -16,11 +16,9 @@ finnhub-python==2.4.20
 vaderSentiment==3.3.2
 feedparser==6.0.11
 
-# LLM / AI Agent Orchestration
-langchain==0.3.14
-langchain-openai==0.3.0
-langchain-google-genai==2.0.8
-langchain-groq==0.2.4
+# NOTE: LLM packages (langchain, langchain-groq, etc.) are NOT included
+# because Render free tier (512MB) doesn't have enough memory.
+# The app runs in rule-based mode on Render automatically.
 
 # Database
 aiosqlite==0.20.0
