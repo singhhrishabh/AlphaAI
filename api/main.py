@@ -49,11 +49,20 @@ async def lifespan(app: FastAPI):
     for w in warnings:
         logger.warning(w)
 
-    # On Render free tier (512MB), disable LLM to save memory
+    # Detect deployment environment
     is_render = os.environ.get('RENDER', '') == 'true'
-    use_llm = not is_render
+    is_hf = os.environ.get('HF_SPACES', '') == 'true' or os.environ.get('SPACE_ID', '') != ''
+
     if is_render:
-        logger.info("☁️  Running on Render free tier — using rule-based mode (no LLM) to save memory")
+        use_llm = False
+        logger.info("☁️  Running on Render — rule-based mode (512MB limit)")
+    elif is_hf:
+        use_llm = True
+        logger.info("🤗 Running on Hugging Face Spaces — full LLM mode enabled!")
+    else:
+        use_llm = True
+        logger.info("💻 Running locally — full LLM mode enabled")
+
     orchestrator = Orchestrator(use_llm=use_llm)
 
     # Add default watchlist stocks to DB
