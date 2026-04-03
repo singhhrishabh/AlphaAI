@@ -11,9 +11,16 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 import yfinance as yf
+import requests
 
 logger = logging.getLogger("alphaai.data.market")
 
+# Configure a customized requests session to bypass rate limits (429 errors)
+_session = requests.Session()
+_session.headers.update({
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+})
 
 class MarketDataProvider:
     """Fetches and caches market data from yfinance."""
@@ -25,7 +32,7 @@ class MarketDataProvider:
 
     def _get_ticker(self, symbol: str) -> yf.Ticker:
         """Get or create a yfinance Ticker object."""
-        return yf.Ticker(symbol)
+        return yf.Ticker(symbol, session=_session)
 
     def _is_cache_valid(self, key: str) -> bool:
         if key not in self._cache_expiry:
