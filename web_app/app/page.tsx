@@ -1,7 +1,22 @@
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { Activity, Briefcase, TrendingUp, ShieldAlert, Cpu } from 'lucide-react';
 
 export default function Dashboard() {
+  const [data, setData] = useState<any>(null);
+  const [signals, setSignals] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Fetch data from FastAPI backend
+    Promise.all([
+      fetch('http://localhost:8000/api/dashboard').then(res => res.json()),
+      fetch('http://localhost:8000/api/signals?limit=5').then(res => res.json())
+    ]).then(([dashboardRes, signalsRes]) => {
+      setData(dashboardRes);
+      setSignals(signalsRes);
+    }).catch(err => console.error("API Error: Maybe FastAPI is offline?", err));
+  }, []);
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <header className="flex justify-between items-center mb-12">
@@ -23,26 +38,36 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <StatCard icon={<Briefcase size={20} />} title="Portfolio Value" value="$142,400.00" trend="+2.4%" />
-        <StatCard icon={<TrendingUp size={20} />} title="Active Signals" value="12" subtitle="3 pending execution" />
-        <StatCard icon={<ShieldAlert size={20} />} title="Risk Level" value="Moderate" subtitle="Sharpe 1.8" />
-        <StatCard icon={<Cpu size={20} />} title="AI Confidence" value="High" subtitle="Agents synced" />
+        <StatCard icon={<TrendingUp size={20} />} title="Active Signals" value={data?.total_signals || 0} subtitle="Tracked via DB" />
+        <StatCard icon={<ShieldAlert size={20} />} title="Tracked Stocks" value={data?.total_stocks || 0} />
+        <StatCard icon={<Cpu size={20} />} title="Recent Analyses" value={data?.recent_analyses?.length || 0} subtitle="Agents synced" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 glass-card p-6 min-h-[400px]">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-            <Activity className="text-blue-400" /> Live Feed
+            <Activity className="text-blue-400" /> Live Feed (FastAPI Connected)
           </h2>
           <div className="flex flex-col gap-4">
-            <FeedItem time="Live" ticker="AAPL" action="BUY" info="Fundamental Agent detected undervalued P/E relative to sector growth." />
-            <FeedItem time="2m ago" ticker="TSLA" action="HOLD" info="Risk Agent vetoed trade due to high implied volatility." />
+            {signals.length > 0 ? (
+              signals.map((sig, idx) => (
+                <FeedItem 
+                  key={idx} 
+                  time={new Date(sig.timestamp).toLocaleTimeString()} 
+                  ticker={sig.symbol} 
+                  action={sig.signal} 
+                  info={sig.reasoning || "Analyzed by AI."} 
+                />
+              ))
+            ) : (
+              <p className="text-gray-500">No signals found. Run via the backend to populate.</p>
+            )}
           </div>
         </div>
         <div className="glass-card p-6 min-h-[400px]">
           <h2 className="text-xl font-semibold mb-6">Recent Executions</h2>
           <div className="space-y-4 text-sm text-gray-300">
-            <p className="p-3 bg-white/5 rounded-lg border border-white/5">Alpaca: BUY 12 MSFT @ $410.20</p>
-            <p className="p-3 bg-white/5 rounded-lg border border-white/5">Alpaca: SELL 5 NVDA @ $122.10</p>
+            <p className="p-3 bg-white/5 rounded-lg border border-white/5">Alpaca: Standby for Execution Webhooks</p>
             <p className="text-center mt-6 text-gray-500">Backend powered by FastAPI & PostgreSQL</p>
           </div>
         </div>

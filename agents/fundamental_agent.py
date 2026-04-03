@@ -203,10 +203,16 @@ class FundamentalAgent(BaseAgent):
             total_score = 0
             normalized_score = 0
 
-        # ── LLM Enhancement ──
+        # ── LLM Enhancement + YC-Tier RAG ──
         llm_result = None
         if self.llm:
             data_summary = self._build_data_summary(symbol, company_info, income_stmt, balance_sheet, cash_flow)
+            
+            # Phase 2: RAG Pipeline Integration (Placeholder for Vector DB like Pinecone)
+            rag_insights = self._run_sec_rag_analysis(symbol)
+            if rag_insights:
+                data_summary += f"\n\n### RAG Insights (SEC 10-K/10-Q)\n{rag_insights}"
+            
             llm_result = self._llm_analyze(FUNDAMENTAL_PROMPT, data_summary)
 
         # ── Combine Results ──
@@ -253,6 +259,19 @@ class FundamentalAgent(BaseAgent):
             risks=risks,
             catalysts=catalysts,
         )
+
+    def _run_sec_rag_analysis(self, symbol: str) -> str:
+        """
+        [YC-Tier Real-World Feature Placeholder]
+        Queries Pinecone/Weaviate vector database containing embedded SEC 10-K, 10-Q filings 
+        and earnings call transcripts to extract qualitative risks and growth catalysts.
+        """
+        logger.info(f"📚 Running SEC RAG Vector Search for {symbol}... (Placeholder)")
+        # Example implementation context:
+        # 1. Fetch embeddings from LangChain Pinecone init
+        # 2. Similarity search for "forward guidance", "risk factors"
+        # 3. Return summary
+        return "Not available in prototype. Implement LangChain + Pinecone here."
 
     def _build_data_summary(self, symbol, info, income_stmt, balance_sheet, cash_flow) -> str:
         """Build a formatted data summary for the LLM."""
