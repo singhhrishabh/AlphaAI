@@ -17,6 +17,12 @@ psycopg2-binary==2.9.9
 celery==5.3.6
 redis==5.0.1
 
+# RAG & Sec Filings
+langchain==0.1.13
+pinecone-client==3.2.2
+langchain-openai==0.1.1
+tiktoken==0.6.0
+
 # Execution API
 alpaca-trade-api==3.2.0
 

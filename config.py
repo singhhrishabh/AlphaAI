@@ -56,6 +56,12 @@ class RiskConfig(BaseSettings):
     risk_free_rate: float = Field(default=0.05, alias="RISK_FREE_RATE")
 
 
+class PineconeConfig(BaseSettings):
+    """Pinecone Vector Database configuration."""
+    api_key: str = Field(default="", alias="PINECONE_API_KEY")
+    index_name: str = Field(default="alphaai-sec-rag", alias="PINECONE_INDEX_NAME")
+
+
 class ServerConfig(BaseSettings):
     """Server configuration."""
     host: str = Field(default="0.0.0.0", alias="API_HOST")
@@ -68,6 +74,7 @@ class AppConfig:
 
     def __init__(self):
         self.llm = LLMConfig()
+        self.pinecone = PineconeConfig()
         self.data = DataConfig()
         self.risk = RiskConfig()
         self.server = ServerConfig()

@@ -262,16 +262,55 @@ class FundamentalAgent(BaseAgent):
 
     def _run_sec_rag_analysis(self, symbol: str) -> str:
         """
-        [YC-Tier Real-World Feature Placeholder]
-        Queries Pinecone/Weaviate vector database containing embedded SEC 10-K, 10-Q filings 
-        and earnings call transcripts to extract qualitative risks and growth catalysts.
+        [YC-Tier Real-World Feature]
+        Queries Pinecone vector database containing embedded SEC 10-K/10-Q filings 
+        and extracts qualitative risks and forward guidance.
         """
-        logger.info(f"📚 Running SEC RAG Vector Search for {symbol}... (Placeholder)")
-        # Example implementation context:
-        # 1. Fetch embeddings from LangChain Pinecone init
-        # 2. Similarity search for "forward guidance", "risk factors"
-        # 3. Return summary
-        return "Not available in prototype. Implement LangChain + Pinecone here."
+        api_key = self.config.pinecone.api_key
+        index_name = self.config.pinecone.index_name
+        
+        if not api_key:
+            logger.info("⚠️ Pinecone API key missing. Skipping SEC RAG Vector Search.")
+            return ""
+
+        try:
+            from langchain_openai import OpenAIEmbeddings
+            from langchain_community.vectorstores import Pinecone as PineconeVectorStore
+            import pinecone
+
+            logger.info(f"📚 Running SEC RAG Vector Search for {symbol}...")
+            
+            # Setup embeddings (matching the model used to index SEC filings)
+            embeddings = OpenAIEmbeddings(
+                model="text-embedding-3-small", 
+                api_key=self.config.llm.openai_api_key
+            )
+            
+            # Connect to Pinecone
+            vectorstore = PineconeVectorStore.from_existing_index(
+                index_name=index_name,
+                embedding=embeddings
+            )
+            
+            # Perform similarity search querying standard qualitative focal points
+            query = f"What are the major risk factors, forward guidance, and competitive threats for {symbol} mentioned in the latest SEC filings?"
+            docs = vectorstore.similarity_search(query, k=3)
+            
+            if not docs:
+                return "No SEC filings found in Vector DB."
+                
+            # Compile RAG context
+            rag_context = "\\n\\n".join([f"**Source:** {d.metadata.get('source', 'SEC Filing')}\\n**Excerpt:** {d.page_content}" for d in docs])
+            
+            logger.info(f"✅ RAG Search complete. Retrieved {len(docs)} documents.")
+            return rag_context
+            
+        except ImportError:
+            logger.error("❌ Missing LangChain/Pinecone dependencies. Run `pip install -r requirements.txt`")
+            return ""
+        except Exception as e:
+            logger.error(f"❌ RAG Search failed for {symbol}: {str(e)}")
+            return ""
 
     def _build_data_summary(self, symbol, info, income_stmt, balance_sheet, cash_flow) -> str:
         """Build a formatted data summary for the LLM."""
