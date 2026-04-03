@@ -112,18 +112,18 @@ class PortfolioManager(BaseAgent):
                 metrics["Time Horizon"] = llm_result["time_horizon"]
         else:
             # Rule-based decision
-            if final_score > 40:
+            if final_score > 30:
                 signal = "STRONG_BUY"
-            elif final_score > 15:
+            elif final_score > 5:
                 signal = "BUY"
-            elif final_score > -15:
+            elif final_score > -5:
                 signal = "HOLD"
-            elif final_score > -40:
+            elif final_score > -30:
                 signal = "SELL"
             else:
                 signal = "STRONG_SELL"
 
-            confidence = min(90, max(15, avg_confidence * 0.7 + abs(final_score) * 0.3))
+            confidence = min(90, max(15, avg_confidence * 0.7 + abs(final_score) * 1.5))
 
             agent_summaries = "; ".join(f"{s.agent_name}: {s.signal} ({s.confidence:.0f}%)" for s in agent_signals)
             reasoning = (

@@ -54,14 +54,16 @@ async def lifespan(app: FastAPI):
     is_hf = os.environ.get('HF_SPACES', '') == 'true' or os.environ.get('SPACE_ID', '') != ''
 
     if is_render:
-        use_llm = False
-        logger.info("☁️  Running on Render — rule-based mode (512MB limit)")
+        use_llm = bool(config.llm.openai_api_key or config.llm.groq_api_key or config.llm.google_api_key)
+        mode = "full LLM mode" if use_llm else "rule-based mode"
+        logger.info(f"☁️  Running on Render — {mode} enabled based on API Keys")
     elif is_hf:
         use_llm = True
         logger.info("🤗 Running on Hugging Face Spaces — full LLM mode enabled!")
     else:
-        use_llm = True
-        logger.info("💻 Running locally — full LLM mode enabled")
+        use_llm = bool(config.llm.openai_api_key or config.llm.groq_api_key or config.llm.google_api_key)
+        mode = "full LLM mode" if use_llm else "rule-based mode"
+        logger.info(f"💻 Running locally — {mode} enabled")
 
     orchestrator = Orchestrator(use_llm=use_llm)
 

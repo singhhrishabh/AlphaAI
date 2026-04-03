@@ -150,6 +150,9 @@ To check whether the AI is working properly and the platform is fully integrated
 4. **Verify Alpaca Paper Trading Execution:**
    Add `ALPACA_API_KEY` and `ALPACA_SECRET_KEY` to your `.env`. Force an analysis. If the Portfolio Manager concludes with `BUY`, check your Alpaca Paper Trading dashboard. You should immediately see a live market order executed for that ticker.
 
+5. **Verify LLM & Rendering Thresholds:**
+   If you ever launch this on Render without an API key, the system falls back to rule-based mode. Rule-based scores have been tuned to be highly sensitive to momentum to prevent the system from getting stuck returning "HOLD" constantly. Provide an LLM key in your `.env` to override this and unlock true AI synthesis.
+
 ---
 
 ## 📁 Project Structure
