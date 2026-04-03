@@ -240,14 +240,14 @@ async def update_watchlist(req: WatchlistUpdate):
 
 # ─── Serve Frontend ──────────────────────────────────────
 
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 
-frontend_dir = Path(__file__).parent.parent / "frontend"
+frontend_dir = Path(__file__).parent.parent / "legacy_frontend"
 
 if frontend_dir.exists():
     # Serve static assets (CSS, JS) from /static
     app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
-    logger.info(f"📁 Serving frontend from {frontend_dir}")
+    logger.info(f"📁 Serving legacy frontend from {frontend_dir}")
 
     @app.get("/", response_class=HTMLResponse)
     async def serve_index():
@@ -256,12 +256,21 @@ if frontend_dir.exists():
     # Catch-all: serve index.html for any non-API path (SPA routing)
     @app.get("/{path:path}")
     async def serve_spa(path: str):
+        # Prevent catching API routes if they slip through
+        if path.startswith("api/"):
+            raise HTTPException(404, "API route not found")
+        
         # Try to serve the file directly first
         file_path = frontend_dir / path
         if file_path.is_file():
             return FileResponse(file_path)
         # Otherwise serve index.html for SPA routing
         return FileResponse(frontend_dir / "index.html")
+else:
+    @app.get("/", response_class=RedirectResponse)
+    async def redirect_to_docs():
+        """Redirect to API documentation if frontend is missing."""
+        return RedirectResponse(url="/docs")
 
 
 # ─── Run Server ──────────────────────────────────────────
