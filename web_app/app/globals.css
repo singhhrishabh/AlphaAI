@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0f1115;
+  --foreground: #eef2ff;
+  --card: rgba(20, 24, 34, 0.6);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --accent: #3b82f6;
+  --success: #10b981;
+  --danger: #ef4444;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.1), transparent 40%);
+  background-attachment: fixed;
+}
+
+.glass-card {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+}
