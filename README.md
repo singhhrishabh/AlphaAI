@@ -32,45 +32,44 @@ For Static WEB page[https://singhhrishabh.github.io/AlphaAI/]
 ---
 ## 📸 Dashboard Preview
 
-The platform features a stunning dark-mode glassmorphism web dashboard:
+The platform now features a stunning dark-mode Next.js dashboard integrated with the FastAPI backend:
 
-- 📊 **Dashboard** — Portfolio overview, top signals, market sentiment
-- 🔍 **Stock Analysis** — Deep-dive into any stock with all AI agent outputs
-- 📡 **Signals Feed** — Real-time BUY/SELL/HOLD signals with confidence bars
-- 💼 **Portfolio** — Track holdings and performance
-- 📄 **Reports** — Browse historical analysis reports
+- 📊 **Dashboard** — Live Portfolio value, tracked signals, database synchronization.
+- 🔍 **Stock Analysis** — Deep-dive with SEC RAG (Pinecone) capabilities.
+- 📡 **Signals Feed** — Web-connected live signal updates.
+- 💼 **Portfolio** — Track holdings directly connected to Alpaca Paper Trading.
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                   DATA LAYER                         │
-│  yfinance │ Finnhub News API │ RSS Feeds             │
-│              ↓        ↓           ↓                  │
-│         Market Data Pipeline │ News Pipeline         │
-│                    ↓                                 │
-│              SQLite Database                         │
-└──────────────────────┬──────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────┐
-│                AI AGENT LAYER                        │
-│                                                      │
-│  🔍 Fundamental    📊 Technical    📰 Sentiment     │
-│     Analyst           Analyst         Analyst        │
-│        │                │               │            │
-│        └───────┬────────┴───────────────┘            │
-│                ▼                                     │
-│        ⚠️ Risk Manager                              │
-│                ▼                                     │
-│        🧠 Portfolio Manager (Final Decision)         │
-└──────────────────────┬──────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────┐
-│               OUTPUT LAYER                           │
-│  Trading Signals │ Analysis Reports │ Web Dashboard  │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                       EXTERNAL PROVIDERS                        │
+│ yfinance │ Finnhub News │ SEC Filings (Pinecone RAG) │ Alpaca   │
+└────────────────┬──────────────┬──────────────┬───────────────┬──┘
+                 │              │              │               │
+┌────────────────▼──────────────▼──────────────▼───────────────▼──┐
+│                   AI AGENT LAYER (FastAPI)                      │
+│                                                                 │
+│  🔍 Fundamental Analyst (RAG-Enabled)                           │
+│  📊 Technical Analyst (pandas-ta Quantitative Math)             │
+│  📰 Sentiment Analyst                                           │
+│  ⚠️ Risk Manager                                                 │
+│                                                                 │
+│  ↳ 🧠 Portfolio Manager (Synthesizes -> issues BUY/SELL)        │
+│  ↳ ⚡️ Trade Executor (Pushes orders to Alpaca)                  │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+┌───────────────────────────────▼─────────────────────────────────┐
+│                      PERSISTENCE LAYER                          │
+│        PostgreSQL (via SQLAlchemy) OR Legacy SQLite             │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+┌───────────────────────────────▼─────────────────────────────────┐
+│                      PRESENTATION LAYER                         │
+│                    Next.js Vercel Frontend                      │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## 🤖 AI Agents
@@ -109,28 +108,47 @@ cp .env.example .env
 # Edit .env to add API keys (optional - works without them!)
 ```
 
-### 3. Run Analysis (CLI)
+### 3. Run the Backend API
 
 ```bash
-# Analyze a stock (rule-based, no API key needed)
-python main.py analyze AAPL --no-llm
-
-# Analyze with AI enhancement (requires LLM API key in .env)
+# Analyze a stock directly from the CLI (Optional)
 python main.py analyze AAPL
 
-# Analyze your full watchlist
-python main.py watchlist --no-llm
-```
-
-### 4. Start the Web Dashboard
-
-```bash
+# 🚀 Start the FastAPI Server (Required for Frontend)
 python main.py server
 
-# Open in browser:
-# Dashboard → http://localhost:8000
-# API Docs  → http://localhost:8000/docs
+# API Docs available at → http://localhost:8000/docs
 ```
+
+### 4. Start the Next.js Frontend
+
+Open a **new terminal tab**:
+
+```bash
+cd web_app
+npm install
+npm run dev
+
+# Open in browser:
+# Next.js Dashboard → http://localhost:3000
+```
+
+---
+
+## 🧪 Testing & Verification
+To check whether the AI is working properly and the platform is fully integrated:
+
+1. **Verify Backend LLM Integration:**
+   Run `python main.py analyze AAPL`. You should see the terminal log each agent (Fundamental, Technical, Sentiment, Risk) executing. The Portfolio Manager will synthesize everything and output a final `BUY/SELL/HOLD` score. If it completes without connection errors, the AI foundation works.
+
+2. **Verify Pinecone RAG (SEC Analysis):**
+   If you inputted `PINECONE_API_KEY` in your `.env`, watch the terminal logs during an analysis. If it logs `📚 Running SEC RAG Vector Search for AAPL...` and outputs `✅ RAG Search complete`, Pinecone is dynamically feeding real SEC filings into the LLM. 
+
+3. **Verify Interactive FastApi <-> Next.js Connection:**
+   Run the backend and frontend simultaneously. Open `http://localhost:3000`. If you see "Active Signals" mirroring the latest output of your analysis rather than reporting connection errors, the full web-stack is live.
+
+4. **Verify Alpaca Paper Trading Execution:**
+   Add `ALPACA_API_KEY` and `ALPACA_SECRET_KEY` to your `.env`. Force an analysis. If the Portfolio Manager concludes with `BUY`, check your Alpaca Paper Trading dashboard. You should immediately see a live market order executed for that ticker.
 
 ---
 
